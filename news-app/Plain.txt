@@ -1,0 +1,9 @@
+news-app/
+├── pages/
+│   ├── index.js
+│   ├── articles/
+│   │   └── [id].js
+└── components/
+    ├── Header.js
+    ├── ArticleList.js
+    └── Article.js
