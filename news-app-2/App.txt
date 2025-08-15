@@ -1,0 +1,152 @@
+// A complete, self-contained Next.js news project with React and Tailwind CSS.
+// It's fully responsive and uses mock data to be immediately runnable.
+
+// IMPORTANT: This code is a single file representation.
+// In a real Next.js project, you would place these components in their respective files.
+
+// --------------------------------------------------------------------------------
+// 1. Mock Data (data/news.js)
+// This array simulates a news API response. It contains a list of articles.
+// --------------------------------------------------------------------------------
+const newsData = [
+    {
+        id: 1,
+        title: "هوش مصنوعی و آینده فناوری: یک بررسی جامع",
+        description: "این مقاله به بررسی تأثیر هوش مصنوعی بر صنایع مختلف و چشم‌انداز آینده آن می‌پردازد.",
+        image: "https://placehold.co/600x400/2962ff/ffffff?text=AI+Future",
+        date: "۱۴۰۲/۰۷/۲۱",
+    },
+    {
+        id: 2,
+        title: "اهمیت حفظ حریم خصوصی داده‌ها در دنیای دیجیتال",
+        description: "در عصر دیجیتال، حفظ حریم خصوصی کاربران به یکی از مهم‌ترین چالش‌ها تبدیل شده است.",
+        image: "https://placehold.co/600x400/ff6d00/ffffff?text=Data+Privacy",
+        date: "۱۴۰۲/۰۷/۲۰",
+    },
+    {
+        id: 3,
+        title: "انرژی‌های تجدیدپذیر: راه حلی برای بحران‌های زیست‌محیطی",
+        description: "مروری بر آخرین پیشرفت‌ها در زمینه انرژی‌های خورشیدی و بادی و تأثیرات آن‌ها بر محیط زیست.",
+        image: "https://placehold.co/600x400/00c853/ffffff?text=Renewable+Energy",
+        date: "۱۴۰۲/۰۷/۱۹",
+    },
+    {
+        id: 4,
+        title: "تأثیر متاورس بر تعاملات اجتماعی و کسب‌وکارها",
+        description: "متاورس چگونه می‌تواند شیوه زندگی و کار ما را در آینده متحول کند؟",
+        image: "https://placehold.co/600x400/aa00ff/ffffff?text=Metaverse",
+        date: "۱۴۰۲/۰۷/۱۸",
+    },
+    {
+        id: 5,
+        title: "خودروهای خودران و آینده حمل‌ونقل هوشمند",
+        description: "تحلیلی بر تکنولوژی‌های کلیدی در خودروهای خودران و موانع پیش‌رو.",
+        image: "https://placehold.co/600x400/ffd600/ffffff?text=Self+Driving+Cars",
+        date: "۱۴۰۲/۰۷/۱۷",
+    },
+    {
+        id: 6,
+        title: "اکتشافات فضایی جدید و پتانسیل‌های ناشناخته",
+        description: "نگاهی به مأموریت‌های اخیر ناسا و اکتشافات جدید در منظومه شمسی.",
+        image: "https://placehold.co/600x400/00b8d4/ffffff?text=Space+Exploration",
+        date: "۱۴۰۲/۰۷/۱۶",
+    },
+];
+
+// --------------------------------------------------------------------------------
+// 2. NewsCard Component (components/NewsCard.js)
+// A reusable component to display a single news article card.
+// --------------------------------------------------------------------------------
+function NewsCard({ article }) {
+    return (
+        <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden">
+            {/* News article image */}
+            <img 
+                src={article.image} 
+                alt={article.title} 
+                className="w-full h-48 object-cover"
+            />
+            <div className="p-4 flex flex-col justify-between">
+                <div>
+                    {/* News article title */}
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">{article.title}</h3>
+                    {/* News article description */}
+                    <p className="text-gray-600 text-sm">{article.description}</p>
+                </div>
+                {/* News article date */}
+                <p className="text-gray-500 text-xs mt-4 self-end">{article.date}</p>
+            </div>
+        </div>
+    );
+}
+
+// --------------------------------------------------------------------------------
+// 3. Main Page (app/page.js)
+// This is the main page that fetches data and displays the news articles.
+// In this case, we're using mock data.
+// --------------------------------------------------------------------------------
+import Head from 'next/head';
+
+// We can define the component for the main page here.
+// In a real project, this would be the default export of app/page.js.
+export default function Home() {
+    return (
+        <div className="bg-gray-100 min-h-screen font-sans">
+            <Head>
+                <title>پروژه خبری</title>
+                <meta name="description" content="یک پروژه خبری ساده با Next.js" />
+                <link rel="icon" href="/favicon.ico" />
+                <script src="https://cdn.tailwindcss.com"></script>
+            </Head>
+
+            {/* Main container with padding and a max-width */}
+            <main className="container mx-auto p-4 md:p-8">
+                {/* Header section with the main title */}
+                <header className="text-center mb-12">
+                    <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-2">
+                        پروژه خبری
+                    </h1>
+                    <p className="text-lg text-gray-600">
+                        آخرین اخبار و رویدادهای مهم
+                    </p>
+                </header>
+
+                {/* Grid layout for the news cards */}
+                <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {/* Mapping over the mock data to render a NewsCard for each article */}
+                    {newsData.map(article => (
+                        <NewsCard key={article.id} article={article} />
+                    ))}
+                </section>
+            </main>
+        </div>
+    );
+}
+
+// --------------------------------------------------------------------------------
+// 4. Root Layout (app/layout.js)
+// This file defines the root layout for the application.
+// In a real project, this would be the default export of app/layout.js.
+// Since we are using Tailwind CDN for simplicity, we don't need a separate CSS file.
+// --------------------------------------------------------------------------------
+// We don't need to define the layout separately since we have the full HTML structure in Home.
+// But for completeness, a typical layout.js would look like this:
+/*
+export default function RootLayout({ children }) {
+    return (
+        <html lang="fa" dir="rtl">
+            <head>
+                <script src="https://cdn.tailwindcss.com"></script>
+                <style>
+                    body {{
+                        fontFamily: 'Inter, sans-serif'
+                    }}
+                </style>
+            </head>
+            <body>
+                {children}
+            </body>
+        </html>
+    );
+}
+*/
