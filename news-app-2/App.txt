@@ -1,12 +1,14 @@
-// A complete, self-contained Next.js news project with React and Tailwind CSS.
-// It's fully responsive and uses mock data to be immediately runnable.
+// A complete Next.js news project with dynamic pages.
+// It includes the main page and a new dynamic page for each article.
 
 // IMPORTANT: This code is a single file representation.
-// In a real Next.js project, you would place these components in their respective files.
+// In a real Next.js project, you would place these components in their respective files:
+// - app/page.jsx (for the Home component)
+// - app/articles/[slug]/page.jsx (for the ArticlePage component)
 
 // --------------------------------------------------------------------------------
 // 1. Mock Data (data/news.js)
-// This array simulates a news API response. It contains a list of articles.
+// Updated mock data to include a unique 'slug' for each article.
 // --------------------------------------------------------------------------------
 const newsData = [
     {
@@ -15,6 +17,7 @@ const newsData = [
         description: "این مقاله به بررسی تأثیر هوش مصنوعی بر صنایع مختلف و چشم‌انداز آینده آن می‌پردازد.",
         image: "https://placehold.co/600x400/2962ff/ffffff?text=AI+Future",
         date: "۱۴۰۲/۰۷/۲۱",
+        slug: "ai-and-the-future-of-technology",
     },
     {
         id: 2,
@@ -22,6 +25,7 @@ const newsData = [
         description: "در عصر دیجیتال، حفظ حریم خصوصی کاربران به یکی از مهم‌ترین چالش‌ها تبدیل شده است.",
         image: "https://placehold.co/600x400/ff6d00/ffffff?text=Data+Privacy",
         date: "۱۴۰۲/۰۷/۲۰",
+        slug: "data-privacy-in-digital-world",
     },
     {
         id: 3,
@@ -29,6 +33,7 @@ const newsData = [
         description: "مروری بر آخرین پیشرفت‌ها در زمینه انرژی‌های خورشیدی و بادی و تأثیرات آن‌ها بر محیط زیست.",
         image: "https://placehold.co/600x400/00c853/ffffff?text=Renewable+Energy",
         date: "۱۴۰۲/۰۷/۱۹",
+        slug: "renewable-energy-solutions",
     },
     {
         id: 4,
@@ -36,6 +41,7 @@ const newsData = [
         description: "متاورس چگونه می‌تواند شیوه زندگی و کار ما را در آینده متحول کند؟",
         image: "https://placehold.co/600x400/aa00ff/ffffff?text=Metaverse",
         date: "۱۴۰۲/۰۷/۱۸",
+        slug: "metaverse-social-impact",
     },
     {
         id: 5,
@@ -43,6 +49,7 @@ const newsData = [
         description: "تحلیلی بر تکنولوژی‌های کلیدی در خودروهای خودران و موانع پیش‌رو.",
         image: "https://placehold.co/600x400/ffd600/ffffff?text=Self+Driving+Cars",
         date: "۱۴۰۲/۰۷/۱۷",
+        slug: "future-of-self-driving-cars",
     },
     {
         id: 6,
@@ -50,45 +57,46 @@ const newsData = [
         description: "نگاهی به مأموریت‌های اخیر ناسا و اکتشافات جدید در منظومه شمسی.",
         image: "https://placehold.co/600x400/00b8d4/ffffff?text=Space+Exploration",
         date: "۱۴۰۲/۰۷/۱۶",
+        slug: "new-space-discoveries",
     },
 ];
 
 // --------------------------------------------------------------------------------
-// 2. NewsCard Component (components/NewsCard.js)
-// A reusable component to display a single news article card.
+// 2. Main Page (app/page.jsx)
+// This is the main page that displays the list of news articles.
+// We've updated this page to use the Link component from Next.js.
 // --------------------------------------------------------------------------------
+import Head from 'next/head';
+import Link from 'next/link'; // Import the Link component
+
+// A reusable component to display a single news article card.
 function NewsCard({ article }) {
     return (
-        <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden">
-            {/* News article image */}
-            <img 
-                src={article.image} 
-                alt={article.title} 
-                className="w-full h-48 object-cover"
-            />
-            <div className="p-4 flex flex-col justify-between">
-                <div>
-                    {/* News article title */}
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">{article.title}</h3>
-                    {/* News article description */}
-                    <p className="text-gray-600 text-sm">{article.description}</p>
+        // The Link component makes the card clickable and navigates to the dynamic URL.
+        <Link href={`/articles/${article.slug}`}>
+            <div className="bg-white rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-transform duration-300 overflow-hidden cursor-pointer">
+                {/* News article image */}
+                <img
+                    src={article.image}
+                    alt={article.title}
+                    className="w-full h-48 object-cover"
+                />
+                <div className="p-4 flex flex-col justify-between">
+                    <div>
+                        {/* News article title */}
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">{article.title}</h3>
+                        {/* News article description */}
+                        <p className="text-gray-600 text-sm line-clamp-3">{article.description}</p>
+                    </div>
+                    {/* News article date */}
+                    <p className="text-gray-500 text-xs mt-4 self-end">{article.date}</p>
                 </div>
-                {/* News article date */}
-                <p className="text-gray-500 text-xs mt-4 self-end">{article.date}</p>
             </div>
-        </div>
+        </Link>
     );
 }
 
-// --------------------------------------------------------------------------------
-// 3. Main Page (app/page.js)
-// This is the main page that fetches data and displays the news articles.
-// In this case, we're using mock data.
-// --------------------------------------------------------------------------------
-import Head from 'next/head';
-
-// We can define the component for the main page here.
-// In a real project, this would be the default export of app/page.js.
+// Main Home page component
 export default function Home() {
     return (
         <div className="bg-gray-100 min-h-screen font-sans">
@@ -99,9 +107,7 @@ export default function Home() {
                 <script src="https://cdn.tailwindcss.com"></script>
             </Head>
 
-            {/* Main container with padding and a max-width */}
             <main className="container mx-auto p-4 md:p-8">
-                {/* Header section with the main title */}
                 <header className="text-center mb-12">
                     <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-2">
                         پروژه خبری
@@ -111,9 +117,7 @@ export default function Home() {
                     </p>
                 </header>
 
-                {/* Grid layout for the news cards */}
                 <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {/* Mapping over the mock data to render a NewsCard for each article */}
                     {newsData.map(article => (
                         <NewsCard key={article.id} article={article} />
                     ))}
@@ -124,29 +128,77 @@ export default function Home() {
 }
 
 // --------------------------------------------------------------------------------
-// 4. Root Layout (app/layout.js)
-// This file defines the root layout for the application.
-// In a real project, this would be the default export of app/layout.js.
-// Since we are using Tailwind CDN for simplicity, we don't need a separate CSS file.
+// 3. Dynamic Article Page (app/articles/[slug]/page.jsx)
+// This new component handles the dynamic page for a single article.
 // --------------------------------------------------------------------------------
-// We don't need to define the layout separately since we have the full HTML structure in Home.
-// But for completeness, a typical layout.js would look like this:
-/*
-export default function RootLayout({ children }) {
+// We define a new component to handle the dynamic routing.
+// Next.js automatically passes 'params' with the slug value.
+export function ArticlePage({ params }) {
+    const { slug } = params;
+
+    // Find the article that matches the slug from the mock data.
+    const article = newsData.find(item => item.slug === slug);
+
+    // If the article is not found, display a 404 message.
+    if (!article) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-8">
+                <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                    صفحه یافت نشد!
+                </h1>
+                <p className="text-gray-600 mb-8">
+                    متاسفانه خبری با این آدرس پیدا نشد.
+                </p>
+                <Link href="/">
+                    <span className="text-blue-600 hover:underline">بازگشت به صفحه اصلی</span>
+                </Link>
+            </div>
+        );
+    }
+
+    // If the article is found, display its content.
     return (
-        <html lang="fa" dir="rtl">
-            <head>
+        <div className="bg-gray-100 min-h-screen font-sans">
+            <Head>
+                <title>{article.title}</title>
+                <meta name="description" content={article.description} />
                 <script src="https://cdn.tailwindcss.com"></script>
-                <style>
-                    body {{
-                        fontFamily: 'Inter, sans-serif'
-                    }}
-                </style>
-            </head>
-            <body>
-                {children}
-            </body>
-        </html>
+            </Head>
+            <main className="container mx-auto p-4 md:p-8">
+                {/* Back button to return to the home page */}
+                <div className="mb-6">
+                    <Link href="/">
+                        <span className="text-blue-600 hover:underline flex items-center">
+                            {/* SVG icon for the back arrow */}
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 ml-1">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                            </svg>
+                            بازگشت به صفحه اصلی
+                        </span>
+                    </Link>
+                </div>
+
+                {/* Article content */}
+                <article className="bg-white rounded-xl shadow-lg p-6 md:p-10">
+                    <img 
+                        src={article.image} 
+                        alt={article.title} 
+                        className="w-full h-80 object-cover rounded-lg mb-6"
+                    />
+                    <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
+                        {article.title}
+                    </h1>
+                    <p className="text-gray-500 text-sm mb-6">{article.date}</p>
+                    <p className="text-gray-700 leading-relaxed text-lg">{article.description}</p>
+                    {/* Placeholder for more detailed article content */}
+                    <p className="text-gray-700 leading-relaxed text-lg mt-4">
+                        لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است و برای شرایط فعلی تکنولوژی مورد نیاز و کاربردهای متنوع با هدف بهبود ابزارهای کاربردی می باشد.
+                    </p>
+                </article>
+            </main>
+        </div>
     );
 }
-*/
+
+// By exporting both Home and ArticlePage, we can demonstrate the full flow in one file.
+// In a real project, they would be in separate files as described above.
