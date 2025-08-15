@@ -1,0 +1,261 @@
+این فایل شامل کدهای لازم برای یک پروژه فروشگاهی ساده با Next.js است که به بخش‌های مختلف تقسیم شده است.فایل: data/products.jsاین فایل شامل داده‌های ساختگی (Mock Data) برای محصولات است. می‌توانید از این داده‌ها برای تست اپلیکیشن استفاده کنید.// داده‌های ساختگی محصولات
+export const products = [
+  {
+    id: 1,
+    name: 'کفش پیاده‌روی',
+    price: 120,
+    description: 'کفش ورزشی سبک و راحت برای پیاده‌روی و دویدن.',
+    image: 'https://placehold.co/600x400/FF5733/FFFFFF?text=Shoe',
+  },
+  {
+    id: 2,
+    name: 'تی‌شرت نخی',
+    price: 35,
+    description: 'تی‌شرت صددرصد نخی با طرحی ساده و کلاسیک.',
+    image: 'https://placehold.co/600x400/33C7FF/FFFFFF?text=T-Shirt',
+  },
+  {
+    id: 3,
+    name: 'کوله پشتی',
+    price: 80,
+    description: 'کوله پشتی با فضای کافی برای لپ‌تاپ و وسایل روزمره.',
+    image: 'https://placehold.co/600x400/98FF33/FFFFFF?text=Backpack',
+  },
+  {
+    id: 4,
+    name: 'ساعت هوشمند',
+    price: 250,
+    description: 'ساعت هوشمند با قابلیت‌های ردیابی فعالیت و اطلاع‌رسانی.',
+    image: 'https://placehold.co/600x400/FF33E0/FFFFFF?text=Smartwatch',
+  },
+];
+فایل: context/CartContext.jsاین فایل شامل Context و Provider برای مدیریت وضعیت سبد خرید است. با استفاده از این Context، می‌توانید به سبد خرید در تمام کامپوننت‌ها دسترسی داشته باشید.import { createContext, useState, useContext } from 'react';
+
+// ایجاد Context برای سبد خرید
+const CartContext = createContext();
+
+// ایجاد Provider برای مدیریت وضعیت سبد خرید
+export const CartProvider = ({ children }) => {
+  const [cart, setCart] = useState([]);
+
+  // تابع برای اضافه کردن محصول به سبد خرید
+  const addToCart = (product) => {
+    setCart((prevCart) => {
+      const existingItem = prevCart.find((item) => item.id === product.id);
+      if (existingItem) {
+        // اگر محصول قبلاً در سبد خرید بود، تعداد آن را افزایش بده
+        return prevCart.map((item) =>
+          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+        );
+      } else {
+        // در غیر این صورت، محصول جدید را به سبد خرید اضافه کن
+        return [...prevCart, { ...product, quantity: 1 }];
+      }
+    });
+  };
+
+  // تابع برای حذف محصول از سبد خرید
+  const removeFromCart = (productId) => {
+    setCart((prevCart) => prevCart.filter((item) => item.id !== productId));
+  };
+
+  const cartTotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
+
+  return (
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, cartTotal }}>
+      {children}
+    </CartContext.Provider>
+  );
+};
+
+// Hook سفارشی برای استفاده از Context سبد خرید
+export const useCart = () => {
+  return useContext(CartContext);
+};
+فایل: pages/_app.jsاین فایل برای رپ کردن کل اپلیکیشن با CartProvider استفاده می‌شود تا Context سبد خرید در همه صفحات در دسترس باشد.import '../styles/globals.css';
+import { CartProvider } from '../context/CartContext';
+
+function MyApp({ Component, pageProps }) {
+  return (
+    <CartProvider>
+      <Component {...pageProps} />
+    </CartProvider>
+  );
+}
+
+export default MyApp;
+فایل: pages/index.js (صفحه خانه)این فایل مربوط به صفحه اصلی وب‌سایت است.import Link from 'next/link';
+
+export default function HomePage() {
+  return (
+    <div className="bg-gray-100 dark:bg-gray-900 min-h-screen flex flex-col items-center justify-center text-gray-900 dark:text-white font-sans">
+      <div className="text-center p-8">
+        <h1 className="text-4xl sm:text-6xl font-extrabold text-indigo-600 dark:text-indigo-400 mb-4">
+          به فروشگاه ما خوش آمدید
+        </h1>
+        <p className="text-xl sm:text-2xl text-gray-700 dark:text-gray-300 mb-8">
+          مجموعه‌ای از بهترین محصولات را کشف کنید.
+        </p>
+        <Link href="/products" passHref>
+          <a className="bg-indigo-500 text-white font-semibold py-3 px-8 rounded-full shadow-lg hover:bg-indigo-600 transition duration-300 transform hover:scale-105">
+            مشاهده محصولات
+          </a>
+        </Link>
+      </div>
+    </div>
+  );
+}
+فایل: pages/products/index.js (صفحه تمام محصولات)این صفحه تمام محصولات را نمایش می‌دهد. از getStaticProps برای بارگذاری محصولات به صورت استاتیک استفاده شده است.import { products } from '../../data/products';
+import Link from 'next/link';
+import Head from 'next/head';
+
+// این تابع در زمان ساخت (Build time) اجرا می‌شود
+export async function getStaticProps() {
+  return {
+    props: {
+      products,
+    },
+  };
+}
+
+export default function ProductsPage({ products }) {
+  return (
+    <div className="bg-gray-100 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-white font-sans p-4 sm:p-8">
+      <Head>
+        <title>تمام محصولات</title>
+      </Head>
+      <div className="max-w-7xl mx-auto py-8">
+        <h1 className="text-3xl sm:text-4xl font-bold text-center text-indigo-600 dark:text-indigo-400 mb-8">
+          تمام محصولات
+        </h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {products.map(product => (
+            <div key={product.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden">
+              <img src={product.image} alt={product.name} className="w-full h-48 object-cover transition-transform duration-300 hover:scale-105" />
+              <div className="p-4 flex flex-col items-start">
+                <h2 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">{product.name}</h2>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">${product.price}</p>
+                <Link href={`/products/${product.id}`} passHref>
+                  <a className="text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 dark:hover:text-indigo-500 font-semibold transition-colors duration-300">
+                    مشاهده جزئیات
+                  </a>
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+فایل: pages/products/[id].js (صفحه جزئیات محصول)این فایل جزئیات یک محصول خاص را نمایش می‌دهد. از getStaticPaths و getStaticProps برای ایجاد صفحات استاتیک برای هر محصول استفاده شده است.import { products } from '../../data/products';
+import { useCart } from '../../context/CartContext';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+
+// این تابع مسیرهای پویا را برای صفحات محصول ایجاد می‌کند
+export async function getStaticPaths() {
+  const paths = products.map((product) => ({
+    params: { id: product.id.toString() },
+  }));
+
+  return { paths, fallback: false };
+}
+
+// این تابع داده‌های مورد نیاز برای هر صفحه محصول را فراهم می‌کند
+export async function getStaticProps({ params }) {
+  const product = products.find((p) => p.id.toString() === params.id);
+  return {
+    props: {
+      product,
+    },
+  };
+}
+
+export default function ProductPage({ product }) {
+  const { addToCart } = useCart();
+  const router = useRouter();
+
+  if (router.isFallback) {
+    return <div className="text-center text-gray-500">در حال بارگذاری...</div>;
+  }
+
+  return (
+    <div className="bg-gray-100 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-white font-sans p-4 sm:p-8">
+      <Head>
+        <title>{product.name}</title>
+      </Head>
+      <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden p-6 sm:p-8 flex flex-col md:flex-row gap-8">
+        <div className="md:w-1/2">
+          <img src={product.image} alt={product.name} className="w-full h-auto rounded-lg shadow-md" />
+        </div>
+        <div className="md:w-1/2 flex flex-col justify-center">
+          <h1 className="text-3xl sm:text-4xl font-bold text-indigo-600 dark:text-indigo-400 mb-4">
+            {product.name}
+          </h1>
+          <p className="text-2xl text-gray-700 dark:text-gray-300 mb-4">${product.price}</p>
+          <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">{product.description}</p>
+          <button
+            onClick={() => addToCart(product)}
+            className="bg-indigo-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:bg-indigo-600 transition duration-300 transform hover:scale-105"
+          >
+            افزودن به سبد خرید
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+فایل: pages/cart.js (صفحه سبد خرید)این فایل سبد خرید را نمایش می‌دهد و به کاربر اجازه می‌دهد محصولات را حذف کند.import Head from 'next/head';
+import { useCart } from '../context/CartContext';
+import Link from 'next/link';
+
+export default function CartPage() {
+  const { cart, removeFromCart, cartTotal } = useCart();
+
+  return (
+    <div className="bg-gray-100 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-white font-sans p-4 sm:p-8">
+      <Head>
+        <title>سبد خرید</title>
+      </Head>
+      <div className="max-w-3xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 sm:p-8">
+        <h1 className="text-3xl sm:text-4xl font-bold text-center text-indigo-600 dark:text-indigo-400 mb-8">
+          سبد خرید شما
+        </h1>
+        {cart.length === 0 ? (
+          <div className="text-center text-gray-500 dark:text-gray-400">
+            <p className="text-lg mb-4">سبد خرید شما خالی است.</p>
+            <Link href="/products" passHref>
+              <a className="text-indigo-500 hover:underline">
+                برای خرید کلیک کنید
+              </a>
+            </Link>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {cart.map(item => (
+              <div key={item.id} className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm">
+                <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-lg" />
+                <div className="flex-grow">
+                  <h2 className="text-lg font-semibold">{item.name}</h2>
+                  <p className="text-gray-600 dark:text-gray-400">${item.price} x {item.quantity}</p>
+                </div>
+                <button
+                  onClick={() => removeFromCart(item.id)}
+                  className="p-2 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-500 rounded-full hover:bg-red-100 dark:hover:bg-red-900 transition"
+                >
+                  حذف
+                </button>
+              </div>
+            ))}
+            <div className="text-right mt-8 pt-4 border-t-2 border-gray-200 dark:border-gray-600">
+              <h3 className="text-2xl font-bold">
+                مجموع: <span className="text-indigo-600 dark:text-indigo-400">${cartTotal.toFixed(2)}</span>
+              </h3>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
